@@ -85,8 +85,7 @@ function writeLpVec3 (value, buffer, offset) {
   buffer.writeUInt16LE(high16, offset + 4)
 
   if (needsContinuation) {
-    const varIntSize = writeVarInt(Math.floor(scale / 4), buffer, offset + 6)
-    return offset + 6 + varIntSize
+    return writeVarInt(Math.floor(scale / 4), buffer, offset + 6)
   }
 
   return offset + 6
