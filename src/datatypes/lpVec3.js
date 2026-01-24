@@ -102,8 +102,4 @@ function sizeOfLpVec3 (value) {
   return 6
 }
 
-module.exports = [
-  (...a) => { console.log('readLpVec3', a); const b = readLpVec3(...a); console.log(b); return b; },
-  (...a) => { console.log('writeLpVec3', a); const b = writeLpVec3(...a); console.log(b); return b; },
-  (...a) => { console.log('sizeOfLpVec3', a); const b = sizeOfLpVec3(...a); console.log(b); return b; },
-]
+module.exports = [readLpVec3, writeLpVec3, sizeOfLpVec3]
