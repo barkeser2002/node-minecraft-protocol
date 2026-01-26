@@ -417,6 +417,17 @@ const values = {
     filtering: false
   },
   lpVec3: { x: 0, y: 0, z: 0 },
+  ExplosionParticleEntry: {
+    data: { // ExplosionParticleInfo
+      particle: {
+        particleId: 0,
+        data: null
+      },
+      speed: 0,
+      scaling: 0
+    },
+    weight: 1
+  },
   DebugSubscriptionDataType: 0,
   DebugSubscriptionUpdate: {
     type: 0
@@ -435,14 +446,6 @@ const values = {
   GlobalPos: {
     dimensionName: 'minecraft:overworld',
     location: { x: 0, y: 64, z: 0 }
-  },
-  ExplosionParticleInfo: {
-    particle: {
-      particleId: 0,
-      data: null
-    },
-    speed: 0,
-    scaling: 0
   }
 }
 
