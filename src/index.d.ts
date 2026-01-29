@@ -11,7 +11,7 @@ import NodeRSA from 'node-rsa';
 
 type PromiseLike = Promise<void> | void
 
-declare module 'minecraft-protocol' {
+declare module 'minecraft-protocol-barkeser2002' {
 	export class Client extends EventEmitter {
 		constructor(isServer: boolean, version: string, customPackets?: any)
 		state: States
