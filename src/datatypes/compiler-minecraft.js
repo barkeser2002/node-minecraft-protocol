@@ -99,11 +99,17 @@ if (n !== 0) {
       "parametrizable",
       (compiler, { type, flags }) => {
         let code = `const { value: val, size } = ${compiler.callType(type, "offset")}\n`;
-        code += "return { value: {\n";
-        for (const key in flags) {
-          code += `  ${key}: !!(val & ${flags[key]}),\n`;
+        code += "const res = {}\n";
+        if (Array.isArray(flags)) {
+          flags.forEach((name, i) => {
+            if (name) code += `res['${name}'] = !!(val & (1 << ${i}))\n`;
+          });
+        } else {
+          for (const mask in flags) {
+            code += `res['${flags[mask]}'] = !!(val & ${mask})\n`;
+          }
         }
-        code += "}, size }";
+        code += "return { value: res, size }";
         return compiler.wrapCode(code);
       },
     ],
@@ -201,10 +207,17 @@ return offset
       "parametrizable",
       (compiler, { type, flags }) => {
         let code = "let val = 0\n";
-        for (const key in flags) {
-          code += `if (value.${key}) val |= ${flags[key]}\n`;
+        if (Array.isArray(flags)) {
+          flags.forEach((name, i) => {
+            if (name) code += `if (value['${name}']) val |= (1 << ${i})\n`;
+          });
+        } else {
+          for (const mask in flags) {
+            code += `if (value['${flags[mask]}']) val |= ${mask}\n`;
+          }
         }
-        code += `return ${compiler.callType("val", type)}`;
+        code += `offset = ${compiler.callType("val", type)}\n`;
+        code += "return offset";
         return compiler.wrapCode(code);
       },
     ],
@@ -291,8 +304,14 @@ return size
       "parametrizable",
       (compiler, { type, flags }) => {
         let code = "let val = 0\n";
-        for (const key in flags) {
-          code += `if (value.${key}) val |= ${flags[key]}\n`;
+        if (Array.isArray(flags)) {
+          flags.forEach((name, i) => {
+            if (name) code += `if (value['${name}']) val |= (1 << ${i})\n`;
+          });
+        } else {
+          for (const mask in flags) {
+            code += `if (value['${flags[mask]}']) val |= ${mask}\n`;
+          }
         }
         code += `return ${compiler.callType("val", type)}`;
         return compiler.wrapCode(code);
