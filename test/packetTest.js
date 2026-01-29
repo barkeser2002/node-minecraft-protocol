@@ -11,7 +11,9 @@ const getField = require('protodef').utils.getField
 const { getPort } = require('./common/util')
 
 function evalCount (count, fields) {
-  if (fields[count.field] in count.map) { return count.map[fields[count.field]] }
+  if (fields[count.field] in count.map) {
+    return count.map[fields[count.field]]
+  }
   return count.default
 }
 
@@ -57,6 +59,21 @@ const nbtValue = {
 
 function getFixedPacketPayload (version, packetName) {
   if (packetName === 'teams') {
+    if (version['>=']('1.21.11')) {
+      // 1.21.11 reverted mode back to raw i8 (0=add, 1=remove, 2=change, 3=join, 4=leave)
+      return {
+        team: 'test_team',
+        mode: 0, // 0 = add
+        name: nbtValue,
+        friendlyFire: 0,
+        nameTagVisibility: 'always',
+        collisionRule: 'always',
+        formatting: 0,
+        prefix: nbtValue,
+        suffix: nbtValue,
+        players: ['player1', 'player2']
+      }
+    }
     if (version['>=']('1.21.6')) {
       return {
         team: 'test_team',
@@ -78,18 +95,13 @@ function getFixedPacketPayload (version, packetName) {
         recipes: [
           {
             name: 'minecraft:campfire_input',
-            items: [
-              903,
-              976
-            ]
+            items: [903, 976]
           }
         ],
         stoneCutterRecipes: [
           {
             input: {
-              ids: [
-                6
-              ]
+              ids: [6]
             },
             slotDisplay: {
               type: 'item_stack',
@@ -113,7 +125,7 @@ function getFixedPacketPayload (version, packetName) {
     }
   }
   if (packetName === 'player_info') {
-    if (version.majorVersion === '1.7') return { playerName: 'test', online: true, ping: 1 }
+    if (version.majorVersion === '1.7') { return { playerName: 'test', online: true, ping: 1 } }
     if (version['>=']('1.19.3')) {
       return {
         action: {
@@ -202,12 +214,18 @@ const values = {
       '..': context
     }
     Object.keys(typeArgs).forEach(function (index) {
-      const v = typeArgs[index].name === 'type' && typeArgs[index].type === 'string' && typeArgs[2] !== undefined &&
+      const v =
+        typeArgs[index].name === 'type' &&
+        typeArgs[index].type === 'string' &&
+        typeArgs[2] !== undefined &&
         typeArgs[2].type !== undefined
-        ? (typeArgs[2].type[1].fields['minecraft:crafting_shapeless'] === undefined ? 'crafting_shapeless' : 'minecraft:crafting_shapeless')
-        : getValue(typeArgs[index].type, results)
+          ? typeArgs[2].type[1].fields['minecraft:crafting_shapeless'] ===
+            undefined
+            ? 'crafting_shapeless'
+            : 'minecraft:crafting_shapeless'
+          : getValue(typeArgs[index].type, results)
       if (typeArgs[index].anon) {
-        Object.keys(v).forEach(key => {
+        Object.keys(v).forEach((key) => {
           results[key] = v[key]
         })
       } else {
@@ -218,19 +236,29 @@ const values = {
     return results
   },
   vec2f: {
-    x: 0, y: 0
+    x: 0,
+    y: 0
   },
   vec3f: {
-    x: 0, y: 0, z: 0
+    x: 0,
+    y: 0,
+    z: 0
   },
   vec3f64: {
-    x: 0, y: 0, z: 0
+    x: 0,
+    y: 0,
+    z: 0
   },
   vec4f: {
-    x: 0, y: 0, z: 0, w: 0
+    x: 0,
+    y: 0,
+    z: 0,
+    w: 0
   },
   vec3i: {
-    x: 0, y: 0, z: 0
+    x: 0,
+    y: 0,
+    z: 0
   },
   count: 1, // TODO : might want to set this to a correct value
   bool: true,
@@ -255,9 +283,7 @@ const values = {
   previousMessages: [],
   i64: [0, 1],
   u64: [0, 1],
-  entityMetadata: [
-    { key: 17, value: 0, type: 0 }
-  ],
+  entityMetadata: [{ key: 17, value: 0, type: 0 }],
   topBitSetTerminatedArray: [
     {
       slot: 0,
@@ -288,7 +314,9 @@ const values = {
         // throw new Error("couldn't find the field " + typeArgs.compareTo + ' of the compareTo and the default is not defined')
       }
       return getValue(typeArgs.default, context)
-    } else { return getValue(i, context) }
+    } else {
+      return getValue(i, context)
+    }
   },
   option: function (typeArgs, context) {
     return getValue(typeArgs, context)
@@ -351,10 +379,7 @@ const values = {
   SpawnInfo: {
     dimension: 0,
     name: 'minecraft:overworld',
-    hashedSeed: [
-      572061085,
-      1191958278
-    ],
+    hashedSeed: [572061085, 1191958278],
     gamemode: 'survival',
     previousGamemode: 255,
     isDebug: false,
@@ -388,10 +413,12 @@ const values = {
   SlotDisplay: { type: 'empty' },
   game_profile: {
     name: 'test',
-    properties: [{
-      key: 'foo',
-      value: 'bar'
-    }]
+    properties: [
+      {
+        key: 'foo',
+        value: 'bar'
+      }
+    ]
   },
   optvarint: 1,
   chat_session: {
@@ -418,7 +445,8 @@ const values = {
   },
   lpVec3: { x: 0, y: 0, z: 0 },
   ExplosionParticleEntry: {
-    data: { // ExplosionParticleInfo
+    data: {
+      // ExplosionParticleInfo
       particle: {
         particleId: 0,
         data: null
@@ -498,20 +526,42 @@ for (const supportedVersion of mc.supportedVersions) {
       client.end()
     })
     let packetInfo
-    Object.keys(packets).filter(function (state) { return state !== 'types' })
+    Object.keys(packets)
+      .filter(function (state) {
+        return state !== 'types'
+      })
       .forEach(function (state) {
         Object.keys(packets[state]).forEach(function (direction) {
           Object.keys(packets[state][direction].types)
             .filter(function (packetName) {
-              return packetName !== 'packet' && packetName.startsWith('packet_')
+              return (
+                packetName !== 'packet' && packetName.startsWith('packet_')
+              )
             })
             .forEach(function (packetName) {
               packetInfo = packets[state][direction].types[packetName]
               packetInfo = packetInfo || null
               if (packetName.includes('bundle_delimiter')) return // not a real packet
-              if (['packet_set_projectile_power', 'packet_debug_sample_subscription'].includes(packetName)) return
-              it(state + ',' + (direction === 'toServer' ? 'Server' : 'Client') + 'Bound,' + packetName,
-                callTestPacket(mcData, packetName.substr(7), packetInfo, state, direction === 'toServer'))
+              if (
+                [
+                  'packet_set_projectile_power',
+                  'packet_debug_sample_subscription'
+                ].includes(packetName)
+              ) { return }
+              it(
+                state +
+                  ',' +
+                  (direction === 'toServer' ? 'Server' : 'Client') +
+                  'Bound,' +
+                  packetName,
+                callTestPacket(
+                  mcData,
+                  packetName.substr(7),
+                  packetInfo,
+                  state,
+                  direction === 'toServer'
+                )
+              )
             })
         })
       })
@@ -525,7 +575,9 @@ for (const supportedVersion of mc.supportedVersions) {
 
     function testPacket (mcData, packetName, packetInfo, state, toServer, done) {
       // empty object uses default values
-      const packet = getFixedPacketPayload(mcData.version, packetName) || getValue(packetInfo, {})
+      const packet =
+        getFixedPacketPayload(mcData.version, packetName) ||
+        getValue(packetInfo, {})
       if (toServer) {
         console.log('Writing to server', packetName, JSON.stringify(packet))
         serverClient.once(packetName, function (receivedPacket) {
@@ -556,14 +608,24 @@ for (const supportedVersion of mc.supportedVersions) {
       })
       Object.keys(p1).forEach(function (field) {
         if (p1[field] !== undefined) {
-          assert.ok(field in p2, 'field ' + field +
-            ' missing in p2, in p1 it has value ' + JSON.stringify(p1[field]))
+          assert.ok(
+            field in p2,
+            'field ' +
+              field +
+              ' missing in p2, in p1 it has value ' +
+              JSON.stringify(p1[field])
+          )
         }
       })
       Object.keys(p2).forEach(function (field) {
         if (p2[field] !== undefined) {
-          assert.ok(field in p1, 'field ' + field + ' missing in p1, in p2 it has value ' +
-            JSON.stringify(p2[field]))
+          assert.ok(
+            field in p1,
+            'field ' +
+              field +
+              ' missing in p1, in p2 it has value ' +
+              JSON.stringify(p2[field])
+          )
         }
       })
     }
