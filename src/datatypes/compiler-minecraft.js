@@ -216,8 +216,7 @@ return offset
             code += `if (value['${flags[mask]}']) val |= ${mask}\n`;
           }
         }
-        code += `offset = ${compiler.callType("val", type)}\n`;
-        code += "return offset";
+        code += compiler.callType("val", type);
         return compiler.wrapCode(code);
       },
     ],
