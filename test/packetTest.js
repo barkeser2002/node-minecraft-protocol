@@ -90,6 +90,20 @@ function getFixedPacketPayload (version, packetName) {
     }
   }
   if (packetName === 'declare_recipes') {
+    if (version['>=']('1.21.11')) {
+      // 1.21.11 reverted to 1.20.5-style recipe format
+      return {
+        recipes: [
+          {
+            name: 'minecraft:crafting_decorated_pot',
+            type: 'minecraft:crafting_decorated_pot',
+            data: {
+              category: 0
+            }
+          }
+        ]
+      }
+    }
     if (version['>=']('1.21.3')) {
       return {
         recipes: [
@@ -125,7 +139,9 @@ function getFixedPacketPayload (version, packetName) {
     }
   }
   if (packetName === 'player_info') {
-    if (version.majorVersion === '1.7') { return { playerName: 'test', online: true, ping: 1 } }
+    if (version.majorVersion === '1.7') {
+      return { playerName: 'test', online: true, ping: 1 }
+    }
     if (version['>=']('1.19.3')) {
       return {
         action: {
@@ -547,7 +563,9 @@ for (const supportedVersion of mc.supportedVersions) {
                   'packet_set_projectile_power',
                   'packet_debug_sample_subscription'
                 ].includes(packetName)
-              ) { return }
+              ) {
+                return
+              }
               it(
                 state +
                   ',' +
